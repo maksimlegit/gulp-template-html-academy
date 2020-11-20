@@ -5,6 +5,7 @@ const sass = require('gulp-sass');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const sync = require('browser-sync').create();
+const ghPages = require('gulp-gh-pages');
 
 const styles = () => {
   return gulp.src('source/sass/style.scss')
@@ -17,7 +18,7 @@ const styles = () => {
     .pipe(sync.stream());
 }
 
-function server(cb) {
+const server = (cb) => {
   sync.init({
     server: {
       baseDir: 'source'
@@ -33,6 +34,11 @@ const watcher = () => {
   gulp.watch('source/sass/**/*.scss', gulp.series(styles));
   gulp.watch('source/*.html').on('change', sync.reload);
 }
+
+gulp.task('deploy', function() {
+  return gulp.src('./source/**/*')
+    .pipe(ghPages());
+});
 
 exports.default = gulp.series(
   styles, server, watcher
